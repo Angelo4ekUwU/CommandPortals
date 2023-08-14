@@ -2,15 +2,13 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    // Uncomment if you need Kotlin
-    //kotlin("jvm") version "1.9.0"
+    kotlin("jvm") version "1.9.0"
     id("xyz.jpenilla.run-paper") version "2.1.0"
     id("net.minecrell.plugin-yml.paper") version "0.6.0"
-    // Uncomment if you need NMS
-    //id("io.papermc.paperweight.userdev") version "1.5.5"
+    id("io.papermc.paperweight.userdev") version "1.5.5"
 }
 
-group = "me.example"
+group = "me.angelo4ek"
 version = "1.0.0"
 
 repositories {
@@ -20,14 +18,15 @@ repositories {
 }
 
 dependencies {
-    compileOnly("io.sapphiremc.sapphire:sapphire-api:1.20.1-R0.1-SNAPSHOT")
-    //paperweight.devBundle("io.sapphiremc.sapphire", "1.20.1-R0.1-SNAPSHOT") // Uncomment if you need NMS
+    paperweight.paperDevBundle("1.20.1-R0.1-SNAPSHOT")
 
-    // Uncomment if you need Kotlin
-    //library(kotlin("stdlib"))
+    library(kotlin("stdlib"))
 
-    val crystalVersion = "2.0.0"
+    library("org.spongepowered:configurate-extra-kotlin:4.1.2")
+
+    val crystalVersion = "2.0.1"
     library("me.denarydev.crystal.paper:utils:$crystalVersion")
+    library("me.denarydev.crystal.paper:serializers:$crystalVersion")
     library("me.denarydev.crystal.shared:config:$crystalVersion")
 }
 
@@ -37,93 +36,53 @@ java {
     }
 }
 
-// Uncomment if you need Kotlin
-//kotlin {
-//    jvmToolchain(17)
-//}
+kotlin {
+    jvmToolchain(17)
+}
 
 paper {
-    // Default values can be overridden if needed
-    // name = "TestPlugin"
-    // version = "1.0"
-    // description = "This is a test plugin"
-    // website = "https://example.com"
-    // author = "Notch"
+    author = "Rafaelka UwU"
 
-    // Plugin main class (required)
-    main = "me.example.testplugin.TestPlugin"
+    loader = "me.rafaelka.cmdportals.loader.PluginLibrariesLoader"
+    main = "me.rafaelka.cmdportals.Main"
 
-    // Plugin bootstrapper/loader (optional)
-    bootstrapper = "me.example.testplugin.bootstrap.TestPluginBootstrap"
-    loader = "me.example.testplugin.loader.PluginLibrariesLoader" // Libraries loader SHOULD be written in Java, not Kotlin
-    hasOpenClassloader = false
-
-    // Generate paper-libraries.json from `library` and `paperLibrary` in `dependencies`
     generateLibrariesJson = true
 
-    // Mark plugin for supporting Folia
     foliaSupported = true
 
-    // API version (Needs to be 1.19 or higher)
     apiVersion = "1.20"
 
-    // Other possible properties from plugin.yml (optional)
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP // or POSTWORLD
-    authors = listOf("Notch", "Notch2")
-
-    prefix = "TEST"
-    defaultPermission = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
-    provides = listOf("TestPluginOldName", "TestPlug")
-
-    bootstrapDependencies {
-        // Required dependency during bootstrap
-        register("WorldEdit")
-
-        // During bootstrap, load BeforePlugin's bootstrap code before ours
-        register("BeforePlugin") {
-            required = false
-            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-        // During bootstrap, load AfterPlugin's bootstrap code after ours
-        register("AfterPlugin") {
-            required = false
-            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.AFTER
-        }
-    }
-
-    serverDependencies {
-        // During server run time, require LuckPerms, add it to the classpath, and load it before us
-        register("LuckPerms") {
-            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-
-        // During server run time, require WorldEdit, add it to the classpath, and load it before us
-        register("WorldEdit") {
-            load = net.minecrell.pluginyml.paper.PaperPluginDescription.RelativeLoadOrder.BEFORE
-        }
-
-        // Optional dependency, add it to classpath if it is available
-        register("ProtocolLib") {
-            required = false
-        }
-
-        // During server run time, optionally depend on Essentials but do not add it to the classpath
-        register("Essentials") {
-            required = false
-            joinClasspath = false
-        }
-    }
-
     permissions {
-        register("testplugin.*") {
-            children = listOf("testplugin.test") // Defaults permissions to true
-            // You can also specify the values of the permissions
-            childrenMap = mapOf("testplugin.test" to true)
+        register("cmdportals.admin") {
+            description = "Allows you to use all plugin commands"
+            children = listOf(
+                "cmdportals.wand",
+                "cmdportals.reload",
+                "cmdportals.create",
+                "cmdportals.delete",
+
+                "cmdportals.actions.add",
+                "cmdportals.actions.remove",
+                "cmdportals.actions.clear",
+                "cmdportals.actions.list",
+
+                "cmdportals.permission.set",
+                "cmdportals.permission.remove",
+            )
         }
-        register("testplugin.test") {
-            description = "Allows you to run the test command"
-            default = BukkitPluginDescription.Permission.Default.OP // TRUE, FALSE, OP or NOT_OP
-        }
+
+        register("cmdportals.wand")
+        register("cmdportals.reload")
+        register("cmdportals.create")
+        register("cmdportals.delete")
+
+        register("cmdportals.actions.add")
+        register("cmdportals.actions.remove")
+        register("cmdportals.actions.clear")
+        register("cmdportals.actions.list")
+
+        register("cmdportals.permission.set")
+        register("cmdportals.permission.remove")
     }
 }
 
@@ -148,13 +107,12 @@ tasks {
         options.isFork = true
     }
 
-    // Uncomment if you need Kotlin
-    //compileKotlin {
-    //    compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    //}
+    compileKotlin {
+        compilerOptions.jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+    }
 
-    processResources {
-        filteringCharset = Charsets.UTF_8.name()
+    assemble {
+        dependsOn(reobfJar)
     }
 
     runServer {

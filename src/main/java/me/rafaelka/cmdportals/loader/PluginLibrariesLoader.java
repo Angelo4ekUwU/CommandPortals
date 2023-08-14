@@ -1,4 +1,4 @@
-package me.example.testplugin.loader;
+package me.rafaelka.cmdportals.loader;
 
 import com.google.gson.Gson;
 import io.papermc.paper.plugin.loader.PluginClasspathBuilder;
